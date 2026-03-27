@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fizjologia Krążenia – Nauka</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --card: #151e30;
+    --card2: #1e2d45;
+    --accent: #38bdf8;
+    --accent2: #0ea5e9;
+    --accent3: #7dd3fc;
+    --green: #34d399;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --purple: #a78bfa;
+    --text: #f0f6ff;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --border: rgba(56,189,248,0.15);
+    --border2: rgba(56,189,248,0.3);
+    --radius: 14px;
+    --radius2: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .app { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 2.5rem; }
+  .header h1 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--accent); letter-spacing: -0.5px; }
+  .header p { color: var(--text2); font-size: 0.9rem; margin-top: 0.25rem; }
+  .badge { display: inline-block; background: rgba(56,189,248,0.12); color: var(--accent3); border: 1px solid var(--border2); border-radius: 20px; padding: 0.2rem 0.8rem; font-size: 0.75rem; margin-top: 0.5rem; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 8px; margin-bottom: 2rem; background: var(--bg2); border-radius: var(--radius); padding: 6px; border: 1px solid var(--border); }
+  .tab { flex: 1; padding: 0.6rem 0.5rem; border: none; border-radius: var(--radius2); background: transparent; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; transition: all .2s; }
+  .tab.active { background: var(--accent2); color: #fff; }
+  .tab:hover:not(.active) { background: var(--bg3); color: var(--text); }
+
+  /* CATEGORY FILTER */
+  .cats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+  .cat-btn { padding: 0.35rem 0.9rem; border-radius: 20px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; transition: all .2s; }
+  .cat-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+  .cat-btn:hover:not(.active) { border-color: var(--accent3); color: var(--accent3); }
+
+  /* STATS BAR */
+  .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); padding: 0.75rem 1rem; text-align: center; }
+  .stat-val { font-size: 1.6rem; font-weight: 600; }
+  .stat-lbl { font-size: 0.72rem; color: var(--text2); margin-top: 2px; }
+  .stat-val.green { color: var(--green); }
+  .stat-val.red { color: var(--red); }
+  .stat-val.blue { color: var(--accent); }
+
+  /* FLASHCARD */
+  .fc-wrap { perspective: 1200px; margin: 0 auto 1.5rem; cursor: pointer; }
+  .fc-inner { position: relative; width: 100%; min-height: 260px; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-inner.flipped { transform: rotateY(180deg); }
+  .fc-face { position: absolute; width: 100%; min-height: 260px; backface-visibility: hidden; border-radius: var(--radius); padding: 2rem 2.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid var(--border2); }
+  .fc-front { background: var(--card); }
+  .fc-back { background: var(--card2); transform: rotateY(180deg); }
+  .fc-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); margin-bottom: 1rem; }
+  .fc-q { font-size: 1.15rem; color: var(--text); line-height: 1.5; }
+  .fc-a { font-size: 1.05rem; color: var(--accent3); line-height: 1.55; }
+  .fc-cat { display: inline-block; margin-top: 1rem; font-size: 0.75rem; padding: 0.2rem 0.7rem; border-radius: 20px; border: 1px solid var(--border); color: var(--text3); }
+  .hint { text-align: center; font-size: 0.8rem; color: var(--text3); margin-bottom: 1rem; }
+
+  /* FC NAVIGATION */
+  .fc-nav { display: flex; align-items: center; gap: 12px; margin-top: 1rem; }
+  .nav-btn { flex: 1; padding: 0.7rem; border: 1px solid var(--border2); background: var(--bg2); color: var(--text); border-radius: var(--radius2); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; transition: all .2s; }
+  .nav-btn:hover { background: var(--bg3); border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-ctr { font-size: 0.85rem; color: var(--text2); min-width: 70px; text-align: center; }
+  .know-btns { display: flex; gap: 10px; margin-top: 0.75rem; }
+  .know-btn { flex: 1; padding: 0.6rem; border-radius: var(--radius2); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; transition: all .2s; }
+  .know-y { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+  .know-y:hover { background: rgba(52,211,153,0.3); }
+  .know-n { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+  .know-n:hover { background: rgba(248,113,113,0.3); }
+
+  /* QUIZ */
+  .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+  .q-num { font-size: 0.8rem; color: var(--text2); }
+  .progress-bar { height: 4px; background: var(--bg3); border-radius: 2px; margin-bottom: 1.5rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent2); border-radius: 2px; transition: width .4s; }
+  .q-text { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem; font-size: 1.1rem; line-height: 1.55; margin-bottom: 1.25rem; }
+  .q-cat-label { font-size: 0.72rem; color: var(--text3); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
+  .opt { padding: 0.85rem 1.25rem; border: 1px solid var(--border2); background: var(--bg2); border-radius: var(--radius2); cursor: pointer; font-size: 0.95rem; transition: all .2s; text-align: left; color: var(--text); font-family: 'DM Sans', sans-serif; }
+  .opt:hover:not(.disabled) { background: var(--bg3); border-color: var(--accent); }
+  .opt.correct { background: rgba(52,211,153,0.15); border-color: var(--green); color: var(--green); }
+  .opt.wrong { background: rgba(248,113,113,0.12); border-color: var(--red); color: var(--red); }
+  .opt.reveal { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.3); color: rgba(52,211,153,0.7); }
+  .opt.disabled { cursor: default; }
+  .q-explanation { background: var(--bg2); border-left: 3px solid var(--accent); border-radius: 0 var(--radius2) var(--radius2) 0; padding: 1rem 1.25rem; font-size: 0.9rem; color: var(--text2); margin-bottom: 1.25rem; line-height: 1.6; }
+  .q-explanation strong { color: var(--accent3); }
+  .next-btn { width: 100%; padding: 0.85rem; background: var(--accent2); border: none; border-radius: var(--radius2); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+  .next-btn:hover { background: var(--accent); }
+
+  /* RESULTS */
+  .results { text-align: center; padding: 2rem; }
+  .results h2 { font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: 0.5rem; }
+  .score-big { font-size: 4rem; font-weight: 700; color: var(--accent); margin: 1rem 0; }
+  .results p { color: var(--text2); margin-bottom: 2rem; }
+  .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 340px; margin: 0 auto 2rem; }
+  .res-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); padding: 1rem; }
+  .res-card .v { font-size: 1.8rem; font-weight: 600; }
+  .res-card .l { font-size: 0.75rem; color: var(--text2); }
+  .restart-btn { padding: 0.85rem 2.5rem; background: var(--accent2); border: none; border-radius: var(--radius2); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+  .restart-btn:hover { background: var(--accent); }
+
+  /* SECTION HEADERS */
+  .section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-bottom: 0.75rem; }
+
+  /* PULSE ANIM */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+  .pulse { animation: pulse 2s infinite; }
+
+  /* hidden */
+  .hidden { display: none !important; }
+
+  @media(max-width:500px) {
+    .fc-face { padding: 1.5rem 1.25rem; }
+    .q-text { padding: 1.25rem 1.25rem; }
+    .stats-bar { grid-template-columns: repeat(3,1fr); }
+    .header h1 { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>Fizjologia Krążenia</h1>
+    <p>Interaktywna nauka na egzamin</p>
+    <span class="badge">53 pytania · 4 działy</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('flashcards')">Fiszki</button>
+    <button class="tab" onclick="switchTab('quiz')">Quiz</button>
+    <button class="tab" onclick="switchTab('browse')">Przeglądaj</button>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="tab-flashcards">
+    <div class="cats" id="fc-cats"></div>
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-val blue" id="fc-total">0</div><div class="stat-lbl">Wszystkich</div></div>
+      <div class="stat"><div class="stat-val green" id="fc-known">0</div><div class="stat-lbl">Umiem</div></div>
+      <div class="stat"><div class="stat-val red" id="fc-unknown">0</div><div class="stat-lbl">Uczę się</div></div>
+    </div>
+    <p class="hint">Kliknij kartę aby zobaczyć odpowiedź</p>
+    <div class="fc-wrap" onclick="flipCard()">
+      <div class="fc-inner" id="fc-inner">
+        <div class="fc-face fc-front">
+          <div class="fc-label">Pytanie</div>
+          <div class="fc-q" id="fc-q"></div>
+          <div class="fc-cat" id="fc-cat"></div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-label">Odpowiedź</div>
+          <div class="fc-a" id="fc-a"></div>
+        </div>
+      </div>
+    </div>
+    <div id="fc-know-btns" class="know-btns hidden">
+      <button class="know-btn know-n" onclick="markCard(false)">✗ Uczę się</button>
+      <button class="know-btn know-y" onclick="markCard(true)">✓ Umiem</button>
+    </div>
+    <div class="fc-nav">
+      <button class="nav-btn" onclick="fcNav(-1)" id="fc-prev">← Poprzednia</button>
+      <div class="nav-ctr" id="fc-counter">1 / 1</div>
+      <button class="nav-btn" onclick="fcNav(1)" id="fc-next">Następna →</button>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:8px">
+      <button class="nav-btn" onclick="shuffleCards()" style="flex:1">🔀 Losuj</button>
+      <button class="nav-btn" onclick="resetProgress()" style="flex:1">↺ Resetuj</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="tab-quiz" class="hidden">
+    <div id="quiz-setup">
+      <p class="section-title">Konfiguracja quizu</p>
+      <div class="cats" id="quiz-cats"></div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;">
+        <label style="font-size:0.85rem;color:var(--text2);display:block;margin-bottom:0.5rem;">Liczba pytań: <span id="quiz-count-lbl" style="color:var(--accent)">15</span></label>
+        <input type="range" min="5" max="53" value="15" id="quiz-count-slider" style="width:100%" oninput="document.getElementById('quiz-count-lbl').textContent=this.value">
+      </div>
+      <button class="next-btn" onclick="startQuiz()">Rozpocznij quiz →</button>
+    </div>
+    <div id="quiz-play" class="hidden">
+      <div class="q-header">
+        <span class="q-num" id="q-num">Pytanie 1 / 15</span>
+        <span class="q-num" id="q-score-live" style="color:var(--accent)">0 pkt</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="q-progress"></div></div>
+      <div class="q-cat-label" id="q-cat-label"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="q-explanation hidden" id="q-explanation"></div>
+      <button class="next-btn hidden" id="q-next-btn" onclick="nextQuestion()">Następne pytanie →</button>
+    </div>
+    <div id="quiz-results" class="hidden results">
+      <h2>Wynik</h2>
+      <div class="score-big" id="score-pct"></div>
+      <p id="score-msg"></p>
+      <div class="res-grid">
+        <div class="res-card"><div class="v green" id="r-correct"></div><div class="l">Poprawnych</div></div>
+        <div class="res-card"><div class="v red" id="r-wrong"></div><div class="l">Błędnych</div></div>
+      </div>
+      <button class="restart-btn" onclick="restartQuiz()">Spróbuj ponownie</button>
+    </div>
+  </div>
+
+  <!-- BROWSE -->
+  <div id="tab-browse" class="hidden">
+    <div class="cats" id="browse-cats"></div>
+    <div id="browse-list"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  // === PODSTAWY PRZEPŁYWU ===
+  {id:1,cat:"Podstawy przepływu",q:"W którym kierunku płynie krew?",a:"Krew płynie z miejsca o wysokim ciśnieniu do miejsca o ciśnieniu niższym (zgodnie z gradientem ciśnień).",opts:["Od wyższego do niższego ciśnienia","Od niższego do wyższego ciśnienia","Niezależnie od gradientu ciśnień","W kierunku zgodnym z ruchem serca"],correct:0,exp:"Krew – jak każdy płyn – przepływa zgodnie z gradientem ciśnień: z obszaru wysokiego ciśnienia do obszaru niskiego ciśnienia. Jest to fundamentalna zasada hemodynamiki."},
+  {id:2,cat:"Podstawy przepływu",q:"Co opisuje prawo Poiseuille'a?",a:"Prawo Poiseuille'a opisuje czynniki determinujące opór przepływu: opór jest wprost proporcjonalny do lepkości krwi i długości naczynia, a odwrotnie proporcjonalny do czwartej potęgi promienia naczynia (R = 8ηL / πr⁴).",opts:["Czynniki determinujące opór przepływu","Zasadę zachowania energii w układzie krążenia","Stosunek skurczu do rozkurczu serca","Właściwości elektryczne kardiomiocytów"],correct:0,exp:"Prawo Poiseuille'a: R = 8ηL / πr⁴. Opór (R) zależy od lepkości (η), długości naczynia (L) i promienia (r) – przy czym promień jest w 4. potędze, więc to on dominuje."},
+  {id:3,cat:"Podstawy przepływu",q:"Który czynnik ma NAJWIĘKSZY wpływ na opór przepływu krwi?",a:"Promień naczynia krwionośnego – opór jest odwrotnie proporcjonalny do czwartej potęgi promienia (r⁴), więc nawet małe zmiany promienia drastycznie zmieniają opór.",opts:["Promień naczynia (r)","Lepkość krwi (η)","Długość naczynia (L)","Ciśnienie tętnicze"],correct:0,exp:"Ponieważ r jest w 4. potędze: zmniejszenie promienia o połowę zwiększa opór 16-krotnie! Dlatego skurcz naczyń (wazokonstrykcja) tak silnie wpływa na ciśnienie krwi."},
+  {id:4,cat:"Podstawy przepływu",q:"Jaki jest związek między przepływem krwi a oporem?",a:"Przepływ krwi jest odwrotnie proporcjonalny do oporu: Q = ΔP / R. Większy opór → mniejszy przepływ (przy stałym gradiencie ciśnień).",opts:["Odwrotnie proporcjonalny do oporu","Wprost proporcjonalny do oporu","Niezależny od oporu","Proporcjonalny do kwadratu oporu"],correct:0,exp:"Analogia do prawa Ohma: Q = ΔP / R (przepływ = różnica ciśnień / opór). Gdy opór rośnie, przepływ maleje."},
+  {id:5,cat:"Podstawy przepływu",q:"Gdy promień naczynia maleje, co dzieje się z oporem przepływu?",a:"Opór wzrasta – i to w ogromnym stopniu, ponieważ opór jest odwrotnie proporcjonalny do r⁴.",opts:["Opór wzrasta","Opór maleje","Opór nie zmienia się","Opór wzrasta proporcjonalnie do r"],correct:0,exp:"Zmniejszenie promienia → duży wzrost oporu (zależność od r⁴). Dlatego wazokonstrykcja znacznie utrudnia przepływ."},
+
+  // === ELEKTROFIZJOLOGIA ===
+  {id:6,cat:"Elektrofizjologia",q:"Co to jest potencjał spoczynkowy błony komórkowej kardiomiocytu?",a:"Potencjał spoczynkowy to stałe ujemne napięcie elektryczne na wewnętrznej stronie błony komórkowej, gdy komórka nie jest pobudzona. Wynosi ok. –90 mV w roboczych kardiomiocytach.",opts:["Stałe ujemne napięcie wewnątrz komórki (~–90 mV)","Napięcie chwilowe podczas pobudzenia komórki","Wartość dodatnia elektryczna na wewnętrznej stronie błony","Gradient jonów sodu przez błonę"],correct:0,exp:"W spoczynku wnętrze kardiomiocytu jest elektroujemne (ok. –90 mV). Wynika to z nierównego rozmieszczenia jonów (głównie K⁺ wewnątrz, Na⁺ zewnątrz) i selektywnej przepuszczalności błony."},
+  {id:7,cat:"Elektrofizjologia",q:"Jak naładowana jest wewnętrzna strona błony komórki w stanie spoczynku?",a:"Wewnętrzna strona błony jest elektroujemna (ujemna), a zewnętrzna – elektrododatnia.",opts:["Elektroujemna (ujemna)","Elektrododatnia (dodatnia)","Elektrycznie neutralna","Zależy od fazy cyklu"],correct:0,exp:"W spoczynku błona jest spolaryzowana: wnętrze ujemne (~–90 mV), zewnętrze dodatnie. To wynik rozmieszczenia jonów K⁺, Na⁺, Cl⁻ i działania pompy Na⁺/K⁺-ATPazy."},
+  {id:8,cat:"Elektrofizjologia",q:"Czym jest depolaryzacja błony komórkowej?",a:"Depolaryzacja to wzrost potencjału błonowego (staje się mniej ujemny lub dodatni) w stosunku do potencjału spoczynkowego. Wywoływana jest napływem jonów Na⁺ do komórki.",opts:["Wzrost potencjału (staje się mniej ujemny)","Spadek potencjału (staje się bardziej ujemny)","Powrót potencjału do wartości spoczynkowej","Brak zmian potencjału"],correct:0,exp:"Depolaryzacja = potencjał rośnie (np. z –90 mV do +20 mV). Jony Na⁺ wpływają do komórki, ich ładunek dodatni zmniejsza ujemność wnętrza."},
+  {id:9,cat:"Elektrofizjologia",q:"Które jony są głównym czynnikiem wywołującym depolaryzację?",a:"Jony sodu (Na⁺) – ich napływ do komórki przez szybkie kanały sodowe wywołuje depolaryzację.",opts:["Jony sodu (Na⁺) – napływ","Jony potasu (K⁺) – wypływ","Jony wapnia (Ca²⁺) – napływ","Jony chloru (Cl⁻) – napływ"],correct:0,exp:"Depolaryzacja inicjowana jest napływem Na⁺. W fazie 0 potencjału czynnościowego otwierają się szybkie kanały sodowe i Na⁺ gwałtownie wpływa do komórki."},
+  {id:10,cat:"Elektrofizjologia",q:"Które jony warunkują repolaryzację?",a:"Repolaryzację warunkuje wypływ jonów potasu (K⁺) z komórki. Kanały potasowe otwierają się i K⁺ opuszcza komórkę, przywracając ujemny potencjał.",opts:["Jony potasu (K⁺) – wypływ","Jony sodu (Na⁺) – wypływ","Jony wapnia (Ca²⁺) – wypływ","Jony chloru (Cl⁻) – napływ"],correct:0,exp:"Repolaryzacja = powrót potencjału do wartości ujemnej. Kanały K⁺ otwierają się, K⁺ wypływa z komórki (zgodnie z gradientem), co przywraca ujemność wnętrza."},
+  {id:11,cat:"Elektrofizjologia",q:"Czym jest pobudzenie (skurcz) kardiomiocytu?",a:"Pobudzenie kardiomiocytu następuje w wyniku depolaryzacji błony komórkowej. Depolaryzacja wyzwala kaskadę prowadzącą do skurczu miofibrylli.",opts:["W wyniku depolaryzacji","W wyniku repolaryzacji","W wyniku polaryzacji (stanu spoczynku)","W wyniku hiperpolaryzacji"],correct:0,exp:"Depolaryzacja → otwarcie kanałów Ca²⁺ → napływ Ca²⁺ → uwolnienie Ca²⁺ z retikulum sarkoplazmatycznego → skurcz sarkomerów."},
+  {id:12,cat:"Elektrofizjologia",q:"Jakie są fazy potencjału czynnościowego kardiomiocytu roboczego?",a:"Faza 0: szybka depolaryzacja (napływ Na⁺). Faza 1: wstępna repolaryzacja. Faza 2: plateau (napływ Ca²⁺). Faza 3: końcowa repolaryzacja (wypływ K⁺). Faza 4: potencjał spoczynkowy.",opts:["0: depolaryzacja, 1: wstępna rep., 2: plateau, 3: końcowa rep., 4: spoczynek","0: spoczynek, 1: depolaryzacja, 2: plateau, 3: repolaryzacja","0–3: depolaryzacja, 4: repolaryzacja","0: plateau, 1: depolaryzacja, 2–3: repolaryzacja"],correct:0,exp:"5 faz. Kluczowa jest faza 2 (plateau) – wydłuża potencjał czynnościowy i zapobiega tężcowi mięśnia sercowego. Trwa 200–300 ms."},
+  {id:13,cat:"Elektrofizjologia",q:"W której fazie potencjału czynnościowego pojawia się plateau?",a:"Plateau pojawia się w fazie 2 – wynika z równowagi między napływem Ca²⁺ i powolnych kanałów Na⁺ a wypływem K⁺.",opts:["Fazie 2","Fazie 0","Fazie 1","Fazie 3"],correct:0,exp:"Faza 2 (plateau) jest charakterystyczna dla kardiomiocytów. Utrzymuje wysoki potencjał przez ~200 ms, co odpowiada mechanicznemu skurczowi."},
+  {id:14,cat:"Elektrofizjologia",q:"Co dzieje się z potencjałem w końcowej fazie repolaryzacji (faza 3)?",a:"Potencjał maleje – wraca do wartości ujemnych zbliżonych do potencjału spoczynkowego. Dominuje wypływ K⁺.",opts:["Maleje (powrót do wartości ujemnych)","Rośnie","Pozostaje stały","Osiąga maksimum"],correct:0,exp:"W fazie 3 szybkie kanały K⁺ otwierają się masowo, K⁺ wypływa i potencjał szybko spada do wartości spoczynkowych (~–90 mV)."},
+  {id:15,cat:"Elektrofizjologia",q:"Czym jest refrakcja bezwzględna?",a:"Refrakcja bezwzględna to okres, w którym żaden bodziec – nawet bardzo silny – nie jest w stanie wyzwolić kolejnego potencjału czynnościowego. Trwa przez czas płasteau (fazy 0–2).",opts:["Okres gdy żaden bodziec nie wywoła potencjału czynnościowego","Okres obniżonej pobudliwości – wymaga silniejszego bodźca","Czas powrotu do potencjału spoczynkowego","Faza wzmożonej pobudliwości"],correct:0,exp:"Refrakcja bezwzględna zapobiega tężcowi mięśnia sercowego. Odpowiada fazie 0–2 potencjału czynnościowego. Serce nie może być 'zatężczone' jak mięsień szkieletowy."},
+  {id:16,cat:"Elektrofizjologia",q:"Czym jest refrakcja względna?",a:"Refrakcja względna to okres po refrakcji bezwzględnej, gdy wystarczająco silny bodziec może wyzwolić potencjał czynnościowy. Pobudliwość jest obniżona, lecz nie zniesiona.",opts:["Okres obniżonej pobudliwości – silny bodziec może pobudzić","Okres zupełnego braku pobudliwości","Normalny stan spoczynku błony","Faza plateau"],correct:0,exp:"Refrakcja względna (faza 3): komórka powoli odzyskuje pobudliwość. Zbyt wczesne pobudzenie może wywołać arytmie (np. tachykardia, migotanie)."},
+  {id:17,cat:"Elektrofizjologia",q:"Co odróżnia komórki rozrusznikowe od roboczych miocytów serca?",a:"Komórki rozrusznikowe wykazują spontaniczną (powolną) spoczynkową depolaryzację – ich potencjał błonowy samoistnie narasta do progu wyzwalając potencjał czynnościowy. Nie mają stabilnego potencjału spoczynkowego.",opts:["Spontaniczna spoczynkowa depolaryzacja","Obecność fazy plateau","Brak kanałów wapniowych","Wyższy potencjał spoczynkowy"],correct:0,exp:"Komórki rozrusznikowe (np. węzła SA) mają niestabilny potencjał spoczynkowy. Powolna spoczynkowa depolaryzacja to ich kluczowa właściwość nadająca rytm serca."},
+  {id:18,cat:"Elektrofizjologia",q:"Które jony wywołują skurcz sarkomerów w miocycie (głównie)?",a:"Głównie jony wapnia (Ca²⁺) zmagazynowane wewnątrz komórki na retikulum sarkoplazmatycznym. Napływ Ca²⁺ z zewnątrz wyzwala ich masowe uwolnienie (CICR – calcium-induced calcium release).",opts:["Ca²⁺ z retikulum sarkoplazmatycznego","Na⁺ napływające do komórki","K⁺ wypływające z komórki","Mg²⁺ z cytozolu"],correct:0,exp:"Skurcz: Ca²⁺ (napływ z zewnątrz przez kanały L-type) → CICR → masowe uwolnienie Ca²⁺ z retikulum → Ca²⁺ + troponina → odsłonięcie aktyny → ślizganie aktyny i miozyny → skurcz."},
+  {id:19,cat:"Elektrofizjologia",q:"Który jest pierwszorzędowym ośrodkiem automatyzmu serca?",a:"Węzeł zatokowo-przedsionkowy (SA – sinoatrial node) – generuje impulsy z częstością 60–100/min i wyznacza rytm zatokowy.",opts:["Węzeł zatokowo-przedsionkowy (SA)","Węzeł przedsionkowo-komorowy (AV)","Pęczek Hisa","Włókna Purkinjego"],correct:0,exp:"Węzeł SA (w prawym przedsionku) jest fizjologicznym rozrusznikiem. Węzeł AV: 40–60/min, pęczek Hisa/Purkinje: 20–40/min – to ośrodki drugorzędowe."},
+  {id:20,cat:"Elektrofizjologia",q:"Za zwalnianie przewodzenia w układzie bodźco-przewodzącym serca odpowiada…",a:"Węzeł przedsionkowo-komorowy (AV – atrioventricular node) – celowo zwalnia przewodzenie o ok. 0,1 s, umożliwiając napełnienie komór krwią przed ich skurczem.",opts:["Węzeł przedsionkowo-komorowy (AV)","Węzeł zatokowo-przedsionkowy (SA)","Pęczek Hisa","Drogi międzywęzłowe"],correct:0,exp:"Opóźnienie w węźle AV (~0,1 s) pozwala przedsionkom zakończyć skurcz i przepchnąć krew do komór zanim te zaczną się kurczyć. Jest to kluczowe dla efektywności serca."},
+  {id:21,cat:"Elektrofizjologia",q:"Co wchodzi w skład komorowego układu przewodzącego?",a:"Pęczek Hisa (wspólny + gałęzie prawa i lewa), włókna Purkinjego – zapewniają szybkie, skoordynowane pobudzenie obu komór.",opts:["Pęczek Hisa i włókna Purkinjego","Węzeł SA i węzeł AV","Węzeł AV i pęczek Hisa","Drogi międzywęzłowe i pęczek Hisa"],correct:0,exp:"Pęczek Hisa – jedyna droga elektryczna przez pierścień włóknisty (izolujący przedsionki od komór). Dzieli się na gałąź prawą i lewą, które kończą się włóknami Purkinjego pobudzającymi miokardium komór."},
+  {id:22,cat:"Elektrofizjologia",q:"Za przewodzenie impulsów między przedsionkami a komorami odpowiada…",a:"Węzeł przedsionkowo-komorowy (AV) i pęczek Hisa – jedyna droga elektryczna przez izolujący szkielet włóknisty serca.",opts:["Węzeł AV i pęczek Hisa","Węzeł SA","Włókna Purkinjego","Drogi międzywęzłowe"],correct:0,exp:"Pierścień włóknisty elektrycznie izoluje przedsionki od komór. Jedyna droga przewodzenia to węzeł AV → pęczek Hisa → gałęzie → Purkinje."},
+
+  // === CYKL HEMODYNAMICZNY ===
+  {id:23,cat:"Cykl serca",q:"Co to jest faza diastoliczna (pauza serca)?",a:"Faza diastoliczna to faza rozkurczu – komory i przedsionki są rozluźnione, krew napływa z żył do przedsionków i przez otwarte zastawki AV do komór.",opts:["Faza rozkurczu – komory napełniają się krwią","Faza skurczu komór","Faza wyrzutu krwi do aorty","Faza skurczu izowolumetrycznego"],correct:0,exp:"Pauza serca: zastawki AV otwarte, półksiężycowate zamknięte. Krew płynie: żyły główne → prawy przedsionek → prawa komora; żyły płucne → lewy przedsionek → lewa komora."},
+  {id:24,cat:"Cykl serca",q:"Podczas pauzy serca (fazy diastolicznej) zastawki przedsionkowo-komorowe są…",a:"Otwarte – umożliwiają swobodny napływ krwi z przedsionków do komór zgodnie z gradientem ciśnień (ciśnienie w przedsionkach jest wyższe niż w komorach).",opts:["Otwarte","Zamknięte","Częściowo otwarte","Zależy od fazy"],correct:0,exp:"Podczas pauzy: zastawki AV otwarte (gradient: przedsionek > komora), zastawki półksiężycowate zamknięte. Komory biernie napełniają się do ~70% objętości."},
+  {id:25,cat:"Cykl serca",q:"Podczas skurczu przedsionków zastawki półksiężycowate (aortalna i pulmonalna) są…",a:"Zamknięte – ciśnienie w komorach jest jeszcze za niskie, by otworzyć zastawki półksiężycowate. Otwarte są zastawki AV (krew wpływa do komór).",opts:["Zamknięte","Otwarte","Najpierw zamknięte, potem otwarte","Otwarte w lewym sercu, zamknięte w prawym"],correct:0,exp:"Skurcz przedsionków: zastawki AV otwarte (krew wpływa do komór), zastawki półksiężycowate zamknięte. Ciśnienie komorowe jest jeszcze niskie."},
+  {id:26,cat:"Cykl serca",q:"Czym jest skurcz izowolumetryczny komór?",a:"Faza skurczu, w której wszystkie zastawki są zamknięte – ciśnienie w komorach rośnie, lecz ich objętość nie zmienia się (izowolumetryczny = stała objętość).",opts:["Skurcz przy zamkniętych zastawkach – wzrost ciśnienia bez zmiany objętości","Skurcz z wyrzutem krwi do aorty","Skurcz przedsionków","Rozkurcz komór"],correct:0,exp:"Skurcz izowolumetryczny: zastawki AV zamknięte (ciśnienie komorowe > ciśnienie w przedsionkach), zastawki półksiężycowate jeszcze zamknięte. Trwa do momentu gdy ciśnienie komorowe przekroczy ciśnienie w aorcie/pniu płucnym."},
+  {id:27,cat:"Cykl serca",q:"Podczas skurczu izowolumetrycznego komór zastawki AV są…",a:"Zamknięte – wzrost ciśnienia komorowego powyżej ciśnienia w przedsionkach powoduje zamknięcie zastawek AV. To wywołuje I ton serca.",opts:["Zamknięte","Otwarte","Zależy od strony serca","Początkowo otwarte"],correct:0,exp:"Skurcz izowolumetryczny: wszystkie zastawki zamknięte. Zamknięcie zastawek AV = I ton serca. Komory kurczą się jak zamknięta puszka."},
+  {id:28,cat:"Cykl serca",q:"Co wywołuje I ton serca?",a:"I ton serca jest wywoływany zamknięciem zastawek przedsionkowo-komorowych (mitralnej i trójdzielnej) na początku skurczu izowolumetrycznego komór.",opts:["Zamknięcie zastawek AV (mitralna, trójdzielna)","Otwarcie zastawek półksiężycowatych","Zamknięcie zastawek półksiężycowatych","Skurcz przedsionków"],correct:0,exp:"I ton (\"lub\"): zamknięcie zastawek AV gdy ciśnienie komorowe przekracza przedsionkowe. II ton (\"dub\"): zamknięcie zastawek półksiężycowatych na początku rozkurczu."},
+  {id:29,cat:"Cykl serca",q:"Co wywołuje II ton serca?",a:"II ton serca jest wywoływany zamknięciem zastawek półksiężycowatych (aortalnej i pulmonalnej) na początku rozkurczu izowolumetrycznego komór.",opts:["Zamknięcie zastawek półksiężycowatych","Zamknięcie zastawek AV","Otwarcie zastawek AV","Skurcz przedsionków"],correct:0,exp:"II ton: gdy ciśnienie komorowe spada poniżej ciśnienia w aorcie/pniu płucnym, zastawki półksiężycowate się zamykają. To słyszalny dźwięk otwierający rozkurcz izowolumetryczny."},
+  {id:30,cat:"Cykl serca",q:"Co to jest rozkurcz izowolumetryczny komór?",a:"Faza rozkurczu, w której wszystkie zastawki są zamknięte – ciśnienie w komorach spada, lecz ich objętość nie zmienia się. Trwa do otwarcia zastawek AV.",opts:["Rozkurcz przy zamkniętych zastawkach – spadek ciśnienia bez zmiany objętości","Rozkurcz z napełnianiem komór","Rozkurcz z wyrzutem krwi","Faza plateau"],correct:0,exp:"Rozkurcz izowolumetryczny: zastawki półksiężycowate właśnie się zamknęły (II ton), zastawki AV jeszcze zamknięte. Komory rozkurczają się izometrycznie aż ciśnienie spadnie poniżej ciśnienia w przedsionkach."},
+  {id:31,cat:"Cykl serca",q:"Co to jest objętość końcowo-rozkurczowa?",a:"Objętość końcowo-rozkurczowa (EDV – End-Diastolic Volume) to objętość krwi w komorze pod koniec rozkurczu (po skurczu przedsionków), tuż przed skurczem komór. Wynosi ok. 120–130 ml.",opts:["Objętość komory pod koniec rozkurczu (~120–130 ml)","Objętość komory pod koniec skurczu (~50–60 ml)","Objętość wyrzucona w czasie jednego skurczu","Objętość minutowa serca"],correct:0,exp:"EDV = maksymalna objętość komory przed skurczem. Jest sumą biernego napełniania (70%) i dopełnienia przez skurcz przedsionków (30%). Determinuje siłę skurczu (prawo Starlinga)."},
+  {id:32,cat:"Cykl serca",q:"Co to jest objętość końcowo-skurczowa?",a:"Objętość końcowo-skurczowa (ESV – End-Systolic Volume) to objętość krwi pozostała w komorze po zakończeniu fazy wyrzutu. Wynosi ok. 50–60 ml.",opts:["Objętość komory po zakończeniu wyrzutu (~50–60 ml)","Objętość komory przed skurczem (~120–130 ml)","Objętość wyrzucona przy jednym skurczu","Objętość minutowa"],correct:0,exp:"ESV = objętość rezydualną komory po wyrzucie. Komora nigdy nie jest zupełnie pusta. ESV zmniejsza się przy działaniu katecholamin (wzrost kurczliwości)."},
+  {id:33,cat:"Cykl serca",q:"Co to jest objętość wyrzutowa (SV)?",a:"Objętość wyrzutowa (SV – Stroke Volume) to różnica między objętością końcowo-rozkurczową (EDV) a końcowo-skurczową (ESV): SV = EDV – ESV. Wynosi ok. 70 ml w spoczynku.",opts:["SV = EDV – ESV (ok. 70 ml)","SV = ESV + EDV","SV = objętość minutowa / HR","SV = ciśnienie skurczowe / opór"],correct:0,exp:"SV = EDV (130 ml) – ESV (60 ml) = 70 ml. Podczas wysiłku SV może wzrosnąć do 100–150 ml dzięki większemu EDV i mniejszemu ESV (wzrost kurczliwości)."},
+  {id:34,cat:"Cykl serca",q:"Co to jest objętość minutowa serca (CO)?",a:"Objętość minutowa (CO – Cardiac Output) to ilość krwi pompowanej przez jedną komorę w ciągu minuty: CO = SV × HR. W spoczynku wynosi ok. 5 L/min.",opts:["CO = SV × HR (ok. 5 L/min w spoczynku)","CO = EDV × HR","CO = SV / HR","CO = ciśnienie / opór"],correct:0,exp:"CO = 70 ml × 70/min ≈ 5 L/min. Podczas wysiłku może wzrosnąć do 20–25 L/min. Jest kluczowym wskaźnikiem wydolności serca."},
+  {id:35,cat:"Cykl serca",q:"Co to jest prawo Starlinga (prawo serca)?",a:"Prawo Starlinga: im większe wypełnienie komory w rozkurczu (większy EDV), tym silniejszy skurcz i większa objętość wyrzutowa. Siła skurczu jest proporcjonalna do wstępnego rozciągnięcia włókien mięśniowych (preload).",opts:["Siła skurczu rośnie wraz z rozciągnięciem włókien (większy EDV → silniejszy skurcz)","Siła skurczu jest stała niezależnie od wypełnienia komory","Większe wypełnienie → słabszy skurcz","Prawo opisuje opór naczyniowy"],correct:0,exp:"Prawo Starlinga = heterometryczna regulacja serca. Większy powrót żylny → większy EDV → silniejsze rozciągnięcie sarkomerów → optymalne nakładanie aktyna-miozyna → mocniejszy skurcz."},
+
+  // === REGULACJA KRĄŻENIA ===
+  {id:36,cat:"Regulacja krążenia",q:"Jaki wpływ na serce ma układ współczulny?",a:"Układ współczulny (poprzez noradrenalinę) zwiększa: częstość akcji (chronotropia +), siłę skurczu (inotropia +), szybkość przewodzenia (dromotropia +) i pobudliwość (batmotropia +).",opts:["Przyśpiesza i wzmacnia pracę serca (działanie dodatnie)","Zwalnia i osłabia pracę serca (działanie ujemne)","Nie wpływa na serce","Wpływa tylko na naczynia"],correct:0,exp:"Współczulny (walka/ucieczka): noradrenalina → receptory β₁ → wzrost cAMP → silniejszy, szybszy skurcz. Przeciwieństwo: przywspółczulny (acetylocholina → receptory M₂ → zwalnianie)."},
+  {id:37,cat:"Regulacja krążenia",q:"Jakie działanie na serce wykazuje acetylocholina?",a:"Acetylocholina (układ przywspółczulny, n. błędny) wykazuje działanie: chronotropowe ujemne (zwalnia HR), dromotropowe ujemne (zwalnia przewodzenie AV), batmotropowe ujemne (zmniejsza pobudliwość). Minimalnie wpływa na inotropię.",opts:["Chronotropowe ujemne, dromotropowe ujemne (zwalnia serce)","Chronotropowe dodatnie, inotropowe dodatnie (przyspiesza serce)","Tylko wazodylatatacyjne","Batmotropowe dodatnie"],correct:0,exp:"ACh → receptor M₂ → ↑ K⁺ przewodność → hiperpolaryzacja węzła SA → wolniejsza spoczynkowa depolaryzacja → bradykardia. Zwalnia też przewodzenie w węźle AV."},
+  {id:38,cat:"Regulacja krążenia",q:"Jakie działanie na serce wykazuje noradrenalina?",a:"Noradrenalina (współczulny) wykazuje działanie: inotropowe dodatnie (silniejszy skurcz), chronotropowe dodatnie (szybszy rytm), dromotropowe dodatnie (szybsze przewodzenie), batmotropowe dodatnie (większa pobudliwość).",opts:["Inotropowe +, chronotropowe +, dromotropowe +, batmotropowe +","Chronotropowe ujemne, dromotropowe ujemne","Tylko naczyniokurczące","Tylko inotropowe dodatnie"],correct:0,exp:"NA → receptor β₁ → ↑ cAMP → ↑ Ca²⁺ → silniejszy, szybszy skurcz. NA działa też na receptory α₁ w naczyniach → wazokonstrykcja → wzrost MAP."},
+  {id:39,cat:"Regulacja krążenia",q:"Co oznacza działanie inotropowe?",a:"Działanie inotropowe dotyczy siły skurczu mięśnia sercowego. Inotropia dodatnia = silniejszy skurcz, ujemna = słabszy skurcz.",opts:["Wpływ na siłę skurczu serca","Wpływ na częstość rytmu serca","Wpływ na szybkość przewodzenia","Wpływ na pobudliwość komórek"],correct:0,exp:"Inotropia (z gr. inos = włókno). Leki inotropowe dodatnie (digoksyna, dobutamina) są stosowane w niewydolności serca do wzmocnienia skurczu."},
+  {id:40,cat:"Regulacja krążenia",q:"Co oznacza działanie chronotropowe?",a:"Działanie chronotropowe dotyczy częstości rytmu serca (HR). Chronotropia dodatnia = przyspieszenie, ujemna = zwolnienie akcji serca.",opts:["Wpływ na częstość rytmu serca (HR)","Wpływ na siłę skurczu","Wpływ na szybkość przewodzenia","Wpływ na objętość wyrzutową"],correct:0,exp:"Chronotropia (z gr. chronos = czas). Przykłady: atropina = chronotropia +, propranolol (beta-bloker) = chronotropia –, digoksyna = chronotropia –."},
+  {id:41,cat:"Regulacja krążenia",q:"Co oznacza działanie dromotropowe?",a:"Działanie dromotropowe dotyczy szybkości przewodzenia bodźców w układzie przewodzącym serca. Dromotropia dodatnia = szybsze, ujemna = wolniejsze przewodzenie.",opts:["Wpływ na szybkość przewodzenia bodźców","Wpływ na siłę skurczu","Wpływ na częstość rytmu","Wpływ na wypełnienie komór"],correct:0,exp:"Dromotropia (z gr. dromos = bieg). Ważna klinicznie: blok AV = dromotropia ujemna. Leki przeciwarytmiczne często są dromotropowo ujemne."},
+  {id:42,cat:"Regulacja krążenia",q:"Co oznacza działanie batmotropowe?",a:"Działanie batmotropowe dotyczy pobudliwości komórek mięśnia sercowego. Batmotropia dodatnia = większa pobudliwość (pro-arytmiczne), ujemna = mniejsza pobudliwość.",opts:["Wpływ na pobudliwość kardiomiocytów","Wpływ na siłę skurczu","Wpływ na częstość rytmu","Wpływ na przewodzenie"],correct:0,exp:"Batmotropia (z gr. bathmos = próg). Wzrost pobudliwości → większe ryzyko arytmii. Obniżenie progu pobudzenia przez katecholaminy = batmotropia +."},
+  {id:43,cat:"Regulacja krążenia",q:"Od czego zależy średnie ciśnienie tętnicze (MAP)?",a:"MAP = CO × TPR, czyli MAP zależy od rzutu serca (CO = SV × HR) i całkowitego oporu obwodowego (TPR). MAP ≈ rozkurczowe + 1/3 (skurczowe – rozkurczowe).",opts:["MAP = CO × TPR (rzut serca × opór obwodowy)","MAP = SV × HR / opór","MAP = ciśnienie skurczowe / 2","MAP zależy tylko od lepkości krwi"],correct:0,exp:"MAP ≈ 93 mmHg (norma). Wzrasta gdy ↑CO (↑HR lub ↑SV) lub ↑TPR (wazokonstrykcja). Spada gdy ↓CO (np. wstrząs) lub ↓TPR (wazodylatacja, np. sepsa)."},
+  {id:44,cat:"Regulacja krążenia",q:"Jaką rolę pełni tlenek azotu (NO) wydzielany przez śródbłonek?",a:"NO jest silnym wazodilatorem – powoduje rozkurcz mięśniówki gładkiej naczyń. Wydzielany przez śródbłonek w odpowiedzi na ścinanie (shear stress) i mediatory.",opts:["Silna wazodylatacja (rozkurcz naczyń)","Wazokonstrykcja (skurcz naczyń)","Zwiększenie krzepliwości","Aktywacja płytek krwi"],correct:0,exp:"NO → guanylilcyklaza → ↑cGMP → rozkurcz mięśni gładkich. Niedobór NO (dysfunkcja śródbłonka) → nadciśnienie, miażdżyca. Nitrowazodylatory (azotany) działają przez uwalnianie NO."},
+  {id:45,cat:"Regulacja krążenia",q:"Jak tworzy się chłonka?",a:"Chłonka powstaje z płynu tkankowego, który filtruje się z naczyń włosowatych do przestrzeni śródmiąższowej (siły Starlinga) i jest wchłaniany przez naczynia limfatyczne. Zawiera białka i tłuszcze (chylomikrony).",opts:["Z płynu tkankowego wchłoniętego przez naczynia limfatyczne","Z krwi tętniczej bezpośrednio","Z wydzieliny gruczołów limfatycznych","Z osocza filtrowanego przez nerki"],correct:0,exp:"Filtracja: ciśnienie hydrostatyczne kapilary > ciśnienie onkotyczne → płyn opuszcza kapilary. Nadmiar płynu tkankowego → naczynia limfatyczne → chłonka → powrót do krwi (przewód piersiowy)."},
+  {id:46,cat:"Regulacja krążenia",q:"Gdzie zlokalizowane są baroreceptory tętnicze?",a:"Baroreceptory tętnicze zlokalizowane są głównie w zatoce tętnicy szyjnej (sinus caroticus) i łuku aorty.",opts:["Zatoka tętnicy szyjnej i łuk aorty","Aorta zstępująca i żyły główne","Serce (przedsionki)","Nerki i nadnercza"],correct:0,exp:"Baroreceptory = mechanoceptory rozciągania. Zatoka szyjna: n. Heringa → n. IX. Łuk aorty: n. depresyjny aorty → n. X. Oba → NTS (jądro pasma samotnego) w rdzeniu przedłużonym."},
+  {id:47,cat:"Regulacja krążenia",q:"Na czym polega odruch z baroreceptorów tętniczych?",a:"Wzrost ciśnienia → rozciągnięcie baroreceptorów → ↑ impulsacja aferentna → NTS → ↑ aktywność przywspółczulna (bradykardia) + ↓ aktywność współczulna (wazodylatacja) → obniżenie MAP. Odwrotnie przy spadku ciśnienia.",opts:["Wzrost ciśnienia → bradykardia + wazodylatacja (ujemne sprzężenie zwrotne)","Wzrost ciśnienia → tachykardia + wazokonstrykcja","Odruch aktywuje układ RAA przy spadku ciśnienia","Baroreceptory regulują wyłącznie HR"],correct:0,exp:"Odruch z baroreceptorów = buforing ciśnienia. Ma składową sercową (HR) i naczyniową (opór). Odbarczenie baroreceptorów (np. ucisk zatoki szyjnej) → wzrost ciśnienia paradoksalnie (receptory nie wyczuwają prawidłowego ciśnienia)."},
+  {id:48,cat:"Regulacja krążenia",q:"Co to jest układ renina-angiotensyna-aldosteron (RAA)?",a:"Układ RAA to hormonalny system regulacji ciśnienia: nerki wydzielają reninę → renina konwertuje angiotensynogen do angiotensyny I → ACE konwertuje AI do angiotensyny II → angiotensyna II wywołuje wazokonstrykcję, zwiększa wydzielanie aldosteronu i ADH, co zatrzymuje Na⁺ i wodę → wzrost ciśnienia.",opts:["Hormonalny układ regulacji ciśnienia: renina→angiotensyna II→wazokonstrykcja+aldosteron","Układ nerwowy kontrolujący ciśnienie krwi","Mechanizm regulacji przepływu wieńcowego","System regulacji rytmu serca"],correct:0,exp:"RAA: kluczowy długoterminowy regulator ciśnienia. ACE (enzym konwertujący): AI→AII. Inhibitory ACE (ramipril) i antagoniści AT₁ (losartan) są lekami na nadciśnienie."},
+  {id:49,cat:"Regulacja krążenia",q:"Jakie bodźce wyzwalają uwalnianie reniny z nerek?",a:"Renina uwalniana jest z komórek aparatu przykłębuszkowego nerki w odpowiedzi na: ↓ ciśnienie w tętniczce doprowadzającej, ↓ NaCl w plamce gęstej, ↑ aktywność współczulną (receptor β₁).",opts:["Spadek ciśnienia w kłębuszku, niskie NaCl w plamce gęstej, stymulacja β₁","Wzrost ciśnienia w kłębuszku","Wysoki poziom angiotensyny II (ujemne sprzężenie)","Wzrost NaCl w kanaliku zbiorczym"],correct:0,exp:"Renina jest wydzielana gdy ciśnienie nerkowe spada (np. utrata krwi, odwodnienie). To inicjuje kaskadę RAA prowadzącą do retencji wody i Na⁺ oraz wzrostu ciśnienia."},
+  {id:50,cat:"Regulacja krążenia",q:"Jakie efekty wywołuje angiotensyna II?",a:"Angiotensyna II: 1) Wazokonstrykcja naczyń → ↑ MAP, 2) ↑ wydzielania aldosteronu przez korę nadnerczy → retencja Na⁺/H₂O, 3) ↑ wydzielania ADH z tylnej przysadki → retencja wody, 4) ↑ pragnienia (podwzgórze), 5) zwężenie tętniczki odprowadzającej kłębuszka → ↑ GFR.",opts:["Wazokonstrykcja, ↑aldosteron, ↑ADH, ↑pragnienie – wszystko prowadzi do ↑ MAP","Wazodylatacja i zmniejszenie objętości krwi","Tylko działanie na nerki – bez wpływu na naczynia","Bezpośrednie działanie na mięsień sercowy"],correct:0,exp:"AII jest wielokierunkowym regulatorem: działa na nerki, nadnercza, przysadkę, podwzgórze i naczynia. Efekt końcowy: ↑ objętości krwi krążącej i ↑ ciśnienia tętniczego."},
+  {id:51,cat:"Regulacja krążenia",q:"Na co działa enzym konwertujący (ACE)?",a:"ACE (Angiotensin Converting Enzyme) konwertuje angiotensynę I (nieaktywną) do angiotensyny II (aktywnej). Rozkłada też bradykininę (wazodylatator).",opts:["Konwertuje angiotensynę I → angiotensynę II","Konwertuje angiotensynogen → angiotensynę I","Rozkłada aldosteron","Aktywuje reninę"],correct:0,exp:"ACE: zlokalizowany głównie w płucach. Inhibitory ACE (ACEi): leki hipotensyjne blokujące tę konwersję. Efekt uboczny ACEi: suchy kaszel (gromadzenie bradykininy). Sartany (ARB) omijają ten problem."},
+  {id:52,cat:"Regulacja krążenia",q:"W wyniku działania angiotensyny II ciśnienie krwi…",a:"Wzrasta – angiotensyna II powoduje wazokonstrykcję, retencję Na⁺ i wody (aldosteron) oraz zwiększa wydzielanie ADH, co zwiększa objętość krwi i ciśnienie.",opts:["Wzrasta","Maleje","Nie zmienia się","Najpierw maleje, potem wzrasta"],correct:0,exp:"AII = presyjny hormon. Efekty: ↑ opór naczyniowy (wazokonstrykcja) + ↑ objętość krwi (aldosteron, ADH) = ↑ MAP. Nadaktywność RAA → nadciśnienie wtórne."},
+  {id:53,cat:"Cykl serca",q:"Jak gradient ciśnień wpływa na zastawki serca?",a:"Zastawki otwierają się gdy ciśnienie jest wyższe po stronie, z której przepływa krew, a zamykają gdy gradient odwraca się (ciśnienie wyższe po drugiej stronie). Ruch krwi zgodny z gradientem ciśnień.",opts:["Zastawka otwiera się gdy ciśnienie przed nią jest wyższe; zamyka gdy gradient się odwraca","Zastawki są kontrolowane aktywnie przez mięśnie serca","Gradient nie wpływa – zastawki otwierają się elektrycznie","Zastawki otwierają się zawsze przy skurczu"],correct:0,exp:"Zastawki serca to bierne struktury – reagują wyłącznie na gradient ciśnień. Płatek mitralny: otwiera się gdy P_przedsionek > P_komora; zamyka gdy P_komora > P_przedsionek."}
+];
+
+const CATS = ["Wszystkie", ...new Set(DATA.map(d=>d.cat))];
+
+// STATE
+let fcCat = "Wszystkie";
+let fcIdx = 0;
+let fcFiltered = [];
+let fcKnown = {};
+let fcFlipped = false;
+
+let quizCat = "Wszystkie";
+let quizQ = [];
+let quizIdx = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+// INIT
+function init(){
+  renderCats('fc-cats', fcCat, c=>{ fcCat=c; fcIdx=0; loadFC(); }, true);
+  renderCats('quiz-cats', quizCat, c=>{ quizCat=c; }, true);
+  renderCats('browse-cats', 'Wszystkie', c=>renderBrowse(c), false);
+  loadFC();
+  renderBrowse('Wszystkie');
+}
+
+function renderCats(containerId, activeCat, onChange, includeAll){
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  (includeAll ? CATS : CATS).forEach(cat=>{
+    const b = document.createElement('button');
+    b.className = 'cat-btn' + (cat===activeCat?' active':'');
+    b.textContent = cat;
+    b.onclick = () => {
+      c.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      onChange(cat);
+    };
+    c.appendChild(b);
+  });
+}
+
+// FLASHCARDS
+function loadFC(){
+  fcFiltered = fcCat==='Wszystkie' ? [...DATA] : DATA.filter(d=>d.cat===fcCat);
+  fcFlipped = false;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  document.getElementById('fc-know-btns').classList.add('hidden');
+  updateFC();
+}
+
+function updateFC(){
+  const card = fcFiltered[fcIdx];
+  if(!card) return;
+  document.getElementById('fc-q').textContent = card.q;
+  document.getElementById('fc-a').textContent = card.a;
+  document.getElementById('fc-cat').textContent = card.cat;
+  document.getElementById('fc-counter').textContent = `${fcIdx+1} / ${fcFiltered.length}`;
+  document.getElementById('fc-prev').disabled = fcIdx===0;
+  document.getElementById('fc-next').disabled = fcIdx===fcFiltered.length-1;
+  const known = Object.values(fcKnown).filter(Boolean).length;
+  const unknown = Object.values(fcKnown).filter(v=>v===false).length;
+  document.getElementById('fc-total').textContent = fcFiltered.length;
+  document.getElementById('fc-known').textContent = known;
+  document.getElementById('fc-unknown').textContent = unknown;
+  fcFlipped = false;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  document.getElementById('fc-know-btns').classList.add('hidden');
+}
+
+function flipCard(){
+  fcFlipped = !fcFlipped;
+  const inner = document.getElementById('fc-inner');
+  if(fcFlipped){
+    inner.classList.add('flipped');
+    document.getElementById('fc-know-btns').classList.remove('hidden');
+  } else {
+    inner.classList.remove('flipped');
+    document.getElementById('fc-know-btns').classList.add('hidden');
+  }
+}
+
+function fcNav(dir){
+  fcIdx = Math.max(0, Math.min(fcFiltered.length-1, fcIdx+dir));
+  updateFC();
+}
+
+function markCard(knows){
+  const card = fcFiltered[fcIdx];
+  fcKnown[card.id] = knows;
+  if(fcIdx < fcFiltered.length-1) fcIdx++;
+  updateFC();
+}
+
+function shuffleCards(){
+  for(let i=fcFiltered.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [fcFiltered[i],fcFiltered[j]]=[fcFiltered[j],fcFiltered[i]];
+  }
+  fcIdx=0; updateFC();
+}
+
+function resetProgress(){
+  fcKnown = {}; fcIdx=0; loadFC();
+}
+
+// QUIZ
+function startQuiz(){
+  const pool = quizCat==='Wszystkie' ? [...DATA] : DATA.filter(d=>d.cat===quizCat);
+  const n = Math.min(parseInt(document.getElementById('quiz-count-slider').value), pool.length);
+  const shuffled = pool.sort(()=>Math.random()-0.5).slice(0,n);
+  quizQ = shuffled;
+  quizIdx = 0; quizScore = 0; quizAnswered = false;
+  document.getElementById('quiz-setup').classList.add('hidden');
+  document.getElementById('quiz-results').classList.add('hidden');
+  document.getElementById('quiz-play').classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = quizQ[quizIdx];
+  quizAnswered = false;
+  document.getElementById('q-num').textContent = `Pytanie ${quizIdx+1} / ${quizQ.length}`;
+  document.getElementById('q-score-live').textContent = `${quizScore} pkt`;
+  document.getElementById('q-progress').style.width = `${(quizIdx/quizQ.length)*100}%`;
+  document.getElementById('q-cat-label').textContent = q.cat;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-explanation').classList.add('hidden');
+  document.getElementById('q-next-btn').classList.add('hidden');
+
+  const shuffledOpts = [...q.opts.map((o,i)=>({o,i}))].sort(()=>Math.random()-0.5);
+  const container = document.getElementById('q-options');
+  container.innerHTML = '';
+  shuffledOpts.forEach(({o,i})=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = o;
+    btn.onclick = () => answerQ(i, q, btn, container);
+    container.appendChild(btn);
+  });
+}
+
+function answerQ(chosen, q, btn, container){
+  if(quizAnswered) return;
+  quizAnswered = true;
+  const correct = chosen === q.correct;
+  if(correct) quizScore++;
+  container.querySelectorAll('.opt').forEach((b,_)=>{
+    b.classList.add('disabled');
+  });
+  container.querySelectorAll('.opt').forEach(b=>{
+    const idx = [...q.opts].indexOf(b.textContent);
+    if(idx === q.correct) b.classList.add('correct');
+    else if(b === btn && !correct) b.classList.add('wrong');
+  });
+  const exp = document.getElementById('q-explanation');
+  exp.innerHTML = `<strong>${correct?'✓ Dobrze!':'✗ Błąd.'}</strong> ${q.exp}`;
+  exp.classList.remove('hidden');
+  document.getElementById('q-next-btn').classList.remove('hidden');
+  document.getElementById('q-next-btn').textContent = quizIdx===quizQ.length-1 ? 'Zobacz wyniki →' : 'Następne pytanie →';
+  document.getElementById('q-score-live').textContent = `${quizScore} pkt`;
+}
+
+function nextQuestion(){
+  quizIdx++;
+  if(quizIdx >= quizQ.length){
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResults(){
+  document.getElementById('quiz-play').classList.add('hidden');
+  document.getElementById('quiz-results').classList.remove('hidden');
+  const pct = Math.round((quizScore/quizQ.length)*100);
+  document.getElementById('score-pct').textContent = `${pct}%`;
+  document.getElementById('r-correct').textContent = quizScore;
+  document.getElementById('r-wrong').textContent = quizQ.length - quizScore;
+  let msg = '';
+  if(pct >= 90) msg = 'Doskonale! Masz to opanowane.';
+  else if(pct >= 70) msg = 'Bardzo dobrze! Jeszcze trochę powtórek i zdasz śpiewająco.';
+  else if(pct >= 50) msg = 'Nieźle, ale warto jeszcze poćwiczyć słabsze działy.';
+  else msg = 'Nie poddawaj się! Wróć do fiszek i spróbuj ponownie.';
+  document.getElementById('score-msg').textContent = msg;
+}
+
+function restartQuiz(){
+  document.getElementById('quiz-results').classList.add('hidden');
+  document.getElementById('quiz-setup').classList.remove('hidden');
+}
+
+// BROWSE
+function renderBrowse(cat){
+  const list = document.getElementById('browse-list');
+  const items = cat==='Wszystkie' ? DATA : DATA.filter(d=>d.cat===cat);
+  list.innerHTML = '';
+  let lastCat = '';
+  items.forEach(item=>{
+    if(item.cat !== lastCat){
+      const h = document.createElement('p');
+      h.className = 'section-title';
+      h.textContent = item.cat;
+      h.style.marginTop = '1.5rem';
+      list.appendChild(h);
+      lastCat = item.cat;
+    }
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:1rem 1.25rem;margin-bottom:8px;cursor:pointer;transition:border-color .2s';
+    card.onmouseenter = () => card.style.borderColor = 'var(--border2)';
+    card.onmouseleave = () => card.style.borderColor = 'var(--border)';
+    let open = false;
+    const q = document.createElement('div');
+    q.style.cssText = 'font-size:.9rem;color:var(--text);line-height:1.5;display:flex;justify-content:space-between;align-items:flex-start;gap:12px';
+    q.innerHTML = `<span>${item.q}</span><span style="color:var(--text3);font-size:1.1rem;flex-shrink:0">▾</span>`;
+    const a = document.createElement('div');
+    a.style.cssText = 'font-size:.85rem;color:var(--accent3);line-height:1.55;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);display:none';
+    a.textContent = item.a;
+    card.onclick = () => {
+      open = !open;
+      a.style.display = open?'block':'none';
+      q.querySelector('span:last-child').textContent = open?'▴':'▾';
+    };
+    card.appendChild(q);
+    card.appendChild(a);
+    list.appendChild(card);
+  });
+}
+
+// TAB SWITCHING
+function switchTab(tab){
+  ['flashcards','quiz','browse'].forEach(t=>{
+    document.getElementById(`tab-${t}`).classList.toggle('hidden', t!==tab);
+  });
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active', ['flashcards','quiz','browse'][i]===tab);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
